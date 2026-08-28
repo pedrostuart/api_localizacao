@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException/*quando a requisição da errado(404)*/, NotFoundException, ServiceUnavailableException/*quando servidor esta inativo */ } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';/*Nossa REquisição pra api(trabalha com Observable)*/
 
-import { lastValueFrom } from 'rxjs';//na api do cep tem varias informações(varios valores em diferentes lugares), o last transforma o observable em uma Promisse que podemos utilizar atraves do await
+import { exhaustAll, lastValueFrom } from 'rxjs';//na api do cep tem varias informações(varios valores em diferentes lugares), o last transforma o observable em uma Promisse que podemos utilizar atraves do await
 import { count } from 'console';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class LocalizacaoService {
             //Assim fazemos uma requisição para a api externa e armazenamos dentro de 'resposta'
             //
             const resposta = await lastValueFrom(
-                this.httpService.get(`https://viacep.com.br/ws$${cepLimpo}/json`)
+                this.httpService.get(`https://viacep.com.br/ws/${cepLimpo}/json`)
             )
             //O conteúdo pela API fica dentro da prioridade data
             const dados = resposta.data
@@ -69,9 +69,9 @@ export class LocalizacaoService {
             //contryCode: fazemos busca dentro do brasil
 
             const resposta = await lastValueFrom (
-                this.httpService.get('https://geocoding-api.open-meteo.com/v1/serch',{
+                this.httpService.get('https://geocoding-api.open-meteo.com/v1/search',{
                     params: {
-                        nome: cidade.trim(),
+                        name: cidade.trim(),
                         count: 1,
                         language: 'pt',
                         contryCode: 'BR'
@@ -103,6 +103,23 @@ export class LocalizacaoService {
                 throw erro
             }
             throw new ServiceUnavailableException("Não foi possivel consultar o serviço de localização")
+        }
+    }
+    async buscarCepComCoordenadas(cep: string){
+        //Primeiro vamos buscar o cEP
+        const endereco = await this.buscarCep(cep)
+        //Depois utilizamos a cidade retornada para consultrar a latitude e longitude
+        const localizacao  = await this.buscarCidade(endereco.cidade)
+
+        //MONTAMOS UMA NOVA RESPOSTA
+        return{
+            cep: endereco.cep,
+            logradouro: endereco.logradouro,
+            bairro: endereco.bairro,
+            cidade: endereco.cidade,
+            estado: endereco.estado,
+            latitude: localizacao.latitude,
+            longitude: localizacao.longitude
         }
     }
 }
