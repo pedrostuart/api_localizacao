@@ -90,7 +90,23 @@ btnLocalizacao.addEventListener("click", () =>{
             //Mostramos as cordenadas na tela
             document.getElementById('latitude').textContent = latitude
             document.getElementById('longitude').textContent = longitude
+            //Apartir daqui, como não precisamos do CEP. limpamos os campos do enfereço
+            document.getElementById('resultadoCep').textContent = '-'
+            document.getElementById('logradouro').textContent = '-'
+            document.getElementById('bairro').textContent = '-'
+            document.getElementById('cidade').textContent = '-'
+            document.getElementById('estado').textContent = '-'
+            //Atualizamos o mapa
+            atualizarMapa(latitude, longitude, 'Minha localização')
+        },
+        (erro)=>{
+            if(erro.code === 1){
+                mensagem.textContent = 'Permissão de localização negada'
+            }else{
+                mensagem.textContent = 'Não foi possivel obter sua localização'
+            }
         }
     )
+    
 })
 
