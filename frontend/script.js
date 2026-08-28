@@ -24,6 +24,7 @@ function preencherInformacoes(dados){
     document.getElementById('bairro').textContent = dados.bairro || '-'
     document.getElementById('cidade').textContent = dados.cidade || '-'
     document.getElementById('estado').textContent = dados.estado || '-'
+    document.getElementById('latitude').textContent = dados.latitude || '-'
     document.getElementById('longitude').textContent = dados.longitude || '-'
 }   
 //função responsavel por atualizar nosso mapa com as novas coordenadas
@@ -71,5 +72,25 @@ btnBuscar.addEventListener('click', async ()=>{
     } catch(erro){
         mensagem.textContent = erro.message
     }
+})
+
+//LOCALIZAÇÃO ATUAL
+btnLocalizacao.addEventListener("click", () =>{
+    mensagem.textContent = '';
+    //Verificamos de o navegador possui suporte a geocalização
+    if(!navigator.geolocation){
+        mensagem.textContent = 'Seu navegador não possui suporte de geocalização'
+    }
+    //Caso tenha suporte, podemos prosseguir solicitando a localização atual
+    navigator.geolocation.getCurrentPosition(
+        (posicao)=>{
+            //Pegamos as informações atraves do navegador
+            const latitude = posicao.coords.latitude
+            const longitude = posicao.coords.longitude
+            //Mostramos as cordenadas na tela
+            document.getElementById('latitude').textContent = latitude
+            document.getElementById('longitude').textContent = longitude
+        }
+    )
 })
 
