@@ -99,6 +99,7 @@ btnLocalizacao.addEventListener("click", () =>{
             //Atualizamos o mapa
             atualizarMapa(latitude, longitude, 'Minha localização')
         },
+        //Caso haja algum erro
         (erro)=>{
             if(erro.code === 1){
                 mensagem.textContent = 'Permissão de localização negada'
